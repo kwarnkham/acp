@@ -17,6 +17,16 @@ class ItemController extends Controller
 
         $item = Item::create($data);
 
-        return response()->json(['item' => $item->load('tickets')], ResponseStatus::CREATED->value);
+        return response()->json(['item' => $item->fresh()], ResponseStatus::CREATED->value);
+    }
+
+    public function index(Request $request)
+    {
+        return response()->json(['data' => Item::query()->paginate()]);
+    }
+
+    public function find(Request $request, Item $item)
+    {
+        return response()->json(['item' => $item]);
     }
 }

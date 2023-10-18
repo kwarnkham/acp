@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(ItemController::class)->middleware(['auth:sanctum'])->prefix('items')->group(function () {
     Route::post('', 'store');
+    Route::get('', 'index');
+    Route::get('{item}', 'find');
 });
 
 Route::controller(AuthController::class)->group(function () {
