@@ -2,12 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
-class Ticket extends Model
+class Ticket extends BaseModel
 {
-    use HasFactory;
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 
-    protected $guarded = [''];
+    public function scopeFilter(Builder $query, array $filters)
+    {
+        $query->when($filters['item_id'] ?? null, function ($query, $itemId) {
+            $query->where('item_id', $itemId);
+        });
+
+        $query->when($filters['status'] ?? null, function ($query, $status) {
+            $query->whereIn('status', explode(',', $status));
+        });
+    }
 }

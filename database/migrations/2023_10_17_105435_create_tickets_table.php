@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedInteger('code');
             $table->foreignId('item_id')->constrained();
             $table->tinyInteger('status')->default(1);
-            $table->unsignedInteger('amount')->default(0);
             $table->timestamps();
         });
     }

@@ -2,15 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\AppModel;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Item extends Model
+class Item extends BaseModel
 {
-    use HasFactory, AppModel;
-
-    protected $guarded = [''];
 
     public function tickets()
     {
