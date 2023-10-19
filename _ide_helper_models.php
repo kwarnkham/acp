@@ -12,11 +12,25 @@
 
 namespace App\Models{
 /**
+ * App\Models\BaseModel
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BaseModel query()
+ */
+	class BaseModel extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * App\Models\Item
  *
  * @property int $id
  * @property string $name
  * @property int $max_tickets
+ * @property int $price_per_ticket
+ * @property int $price
+ * @property string|null $note
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ticket> $tickets
@@ -28,9 +42,33 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereMaxTickets($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Item whereNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Item wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Item wherePricePerTicket($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereUpdatedAt($value)
  */
 	class Item extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Role
+ *
+ * @property int $id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Role whereUpdatedAt($value)
+ */
+	class Role extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -41,17 +79,23 @@ namespace App\Models{
  * @property int $code
  * @property int $item_id
  * @property int $status
- * @property int $amount
+ * @property string|null $buyer
+ * @property string|null $payment_screenshot
+ * @property string|null $expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Item $item
+ * @method static \Illuminate\Database\Eloquent\Builder|Ticket filter(array $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket query()
- * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereBuyer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ticket wherePaymentScreenshot($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereUpdatedAt($value)
  */
@@ -69,6 +113,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])

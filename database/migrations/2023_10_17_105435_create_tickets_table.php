@@ -16,6 +16,9 @@ return new class extends Migration
             $table->unsignedInteger('code');
             $table->foreignId('item_id')->constrained();
             $table->tinyInteger('status')->default(1);
+            $table->string('buyer')->nullable();
+            $table->string('payment_screenshot')->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }
