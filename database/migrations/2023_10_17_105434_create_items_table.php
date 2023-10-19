@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedInteger('max_tickets');
-            $table->unsignedBigInteger('amount_per_ticket');
+            $table->unsignedBigInteger('price_per_ticket');
+            $table->unsignedBigInteger('price');
             $table->string('note')->nullable();
             $table->timestamps();
         });

@@ -13,7 +13,8 @@ class ItemController extends Controller
         $data = $request->validate([
             'name' => ['required'],
             'max_tickets' => ['required', 'max:1000', 'numeric'],
-            'amount_per_ticket' => ['required', 'min:0', 'numeric']
+            'price_per_ticket' => ['required', 'min:0', 'numeric'],
+            'price' => ['required', 'min:0', 'numeric']
         ]);
 
         $item = Item::create($data);
