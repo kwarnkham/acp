@@ -24,4 +24,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
+
+    public function generateToken()
+    {
+        $this->tokens()->delete();
+        $token = $this->createToken('fb');
+        return $token->plainTextToken;
+    }
 }

@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->string('password');
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('fb_id')->unique()->nullable();
+            $table->string('fb_name')->nullable();
+            $table->string('password')->nullable();
             $table->timestamps();
         });
     }
