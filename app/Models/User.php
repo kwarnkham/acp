@@ -25,6 +25,12 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function tickets()
+    {
+        return $this->belongsToMany(Ticket::class)->withTimestamps()->withPivot(['expires_at']);
+    }
+
+
     public function generateToken()
     {
         $this->tokens()->delete();

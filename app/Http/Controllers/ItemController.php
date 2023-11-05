@@ -31,4 +31,15 @@ class ItemController extends Controller
     {
         return response()->json(['item' => $item]);
     }
+
+    public function update(Request $request, Item $item)
+    {
+        $data = $request->validate([
+            'name' => ['required'],
+            'price' => ['required', 'min:0', 'numeric']
+        ]);
+        $item->update($data);
+
+        return response()->json(['item' => $item]);
+    }
 }

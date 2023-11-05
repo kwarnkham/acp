@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TicketStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,10 +16,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('code');
             $table->foreignId('item_id')->constrained();
-            $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('status')->default(TicketStatus::AVAILABLE->value);
             $table->string('buyer')->nullable();
             $table->string('payment_screenshot')->nullable();
-            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }

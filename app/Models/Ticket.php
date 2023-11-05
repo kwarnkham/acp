@@ -11,6 +11,11 @@ class Ticket extends BaseModel
         return $this->belongsTo(Item::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
     public function scopeFilter(Builder $query, array $filters)
     {
         $query->when($filters['item_id'] ?? null, function ($query, $itemId) {
