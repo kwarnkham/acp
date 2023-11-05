@@ -14,11 +14,10 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('code');
             $table->foreignId('item_id')->constrained();
+            $table->unsignedInteger('code');
             $table->tinyInteger('status')->default(TicketStatus::AVAILABLE->value);
-            $table->string('buyer')->nullable();
-            $table->string('payment_screenshot')->nullable();
+            $table->foreignId('user_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

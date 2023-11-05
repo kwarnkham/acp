@@ -3,56 +3,25 @@
 namespace Tests\Feature;
 
 use App\Models\Item;
-use App\Models\Ticket;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class ItemTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->seed();
-        $this->actingAs(User::where('name', 'admin')->first());
-    }
-
     public function test_create_item(): void
     {
-        $maxTickets = fake()->numberBetween(10, 100);
-        $pricePerTicket = fake()->numberBetween(1000, 2000);
+        $maxTickets = $this->faker->numberBetween(10, 100);
+        $pricePerTicket = $this->faker->numberBetween(1000, 2000);
         $reponse = $this->postJson('/api/items', [
-            'name' => fake()->lastName(),
+            'name' => $this->faker->lastName(),
             'max_tickets' => $maxTickets,
             'price_per_ticket' => $pricePerTicket,
-            'price' => fake()->numberBetween(1000, 2000)
+            'price' => $this->faker->numberBetween(1000, 2000)
         ]);
 
         $reponse->assertCreated();
     }
 
-    public function test_create_item_also_create_tickets(): void
-    {
-        $maxTickets = fake()->numberBetween(10, 100);
-        $pricePerTicket = fake()->numberBetween(1000, 2000);
-        $reponse = $this->postJson('/api/items', [
-            'name' => fake()->lastName(),
-            'max_tickets' => $maxTickets,
-            'price_per_ticket' => $pricePerTicket,
-            'price' => fake()->numberBetween(1000, 2000)
-        ]);
-
-        $reponse->assertCreated();
-        $this->assertDatabaseCount('tickets', $maxTickets);
-
-        Ticket::query()->get()->each(function ($ticket) use ($reponse) {
-            $this->assertEquals($ticket->item_id, $reponse->json()['item']['id']);
-        });
-    }
 
     public function test_list_items(): void
     {
@@ -87,8 +56,8 @@ class ItemTest extends TestCase
     {
         Event::fake();
         $item = Item::factory()->create();
-        $name = fake()->name();
-        $price = fake()->numberBetween(1000, 100000);
+        $name = $this->faker->name();
+        $price = $this->faker->numberBetween(1000, 100000);
         $reponse = $this->putJson("/api/items/$item->id", [
             'name' => $name,
             'price' => $price

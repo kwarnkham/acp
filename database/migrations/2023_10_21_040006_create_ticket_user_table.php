@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->unique(['ticket_id', 'user_id']);
             $table->timestamp('expires_at')->nullable();
+            $table->string('screenshot')->nullable();
             $table->timestamps();
         });
     }
