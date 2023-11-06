@@ -14,4 +14,9 @@ class Item extends BaseModel
     {
         return $this->hasMany(Picture::class);
     }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
 }

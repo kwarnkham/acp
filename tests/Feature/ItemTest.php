@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Item;
 use App\Models\Picture;
+use App\Models\Ticket;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +47,16 @@ class ItemTest extends TestCase
         });
     }
 
+    public function test_set_result_of_an_item()
+    {
+        $item = Item::factory()->state(['max_tickets' => 4])->create();
+        $winner = Ticket::inRandomOrder()->first();
+        $this->postJson("api/items/$item->id/result", ['ticket_id' => $winner->id])
+            ->assertOk()
+            ->assertJsonPath('item.ticket_id', $winner->id);
+
+        $this->assertEquals($item->fresh()->ticket_id, $winner->id);
+    }
 
     public function test_list_items(): void
     {

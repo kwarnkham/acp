@@ -19,6 +19,7 @@ Route::controller(ItemController::class)->middleware(['auth:sanctum'])->prefix('
     Route::get('', 'index');
     Route::get('{item}', 'find');
     Route::put('{item}', 'update');
+    Route::post('{item}/result', 'result');
 });
 
 Route::controller(TicketController::class)->middleware(['auth:sanctum'])->prefix('tickets')->group(function () {

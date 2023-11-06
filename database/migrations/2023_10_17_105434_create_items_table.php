@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('price_per_ticket');
             $table->unsignedBigInteger('price');
             $table->string('note')->nullable();
+            $table->foreignId('ticket_id')->unique()->nullable();
             $table->timestamps();
         });
     }
