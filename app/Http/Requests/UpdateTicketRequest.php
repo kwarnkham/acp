@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ResponseStatus;
 use App\Enums\TicketStatus;
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,7 +15,11 @@ class UpdateTicketRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return
+            $this->status != TicketStatus::CONFIRMED_PAID->value
+            || $this->user()->roles->contains(
+                Role::query()->where('name', 'admin')->first()
+            );
     }
 
     /**
@@ -25,7 +30,8 @@ class UpdateTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::in(TicketStatus::statuses())]
+            'status' => ['required', Rule::in(TicketStatus::statuses())],
+            'screenshot' => ['required_if:status,' . TicketStatus::PAID->value, 'image']
         ];
     }
 

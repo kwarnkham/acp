@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ticket_user', function (Blueprint $table) {
+        Schema::create('preferences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ticket_id')->constrained();
-            $table->foreignId('user_id')->constrained();
-            $table->timestamp('expires_at')->nullable();
-            $table->string('screenshot')->nullable();
+            $table->unsignedInteger('ticket_expiration')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ticket_user');
+        Schema::dropIfExists('preferences');
     }
 };

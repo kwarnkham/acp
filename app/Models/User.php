@@ -3,9 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -27,7 +31,38 @@ class User extends Authenticatable
 
     public function tickets()
     {
-        return $this->belongsToMany(Ticket::class)->withTimestamps()->withPivot(['expires_at']);
+        return $this->belongsToMany(Ticket::class)->withTimestamps()->withPivot(['expires_at', 'screenshot', 'id']);
+    }
+
+    public function bookTicket(Ticket $ticket): bool
+    {
+        $this->tickets()->attach($ticket, ['expires_at' => now()->addMinutes(Preference::first()->ticket_expiration)]);
+        return $ticket->update(['status' => TicketStatus::BOOKED->value]);
+    }
+
+    public function payTicket(Ticket $ticket, UploadedFile $screenshot): bool
+    {
+        $userTicket = $this->tickets()
+            ->latest('id')
+            ->wherePivot('expires_at', '>', now())
+            ->wherePivot('ticket_id', $ticket->id)
+            ->first();
+        if ($userTicket == null) return false;
+
+        $path = Storage::putFileAs(
+            'ticket_payments',
+            $screenshot,
+            $userTicket->pivot->id . '__' . $userTicket->pivot->user_id . '__' . $userTicket->pivot->ticket_id . '.' . $screenshot->getClientOriginalExtension()
+        );
+
+        $this->tickets()->updateExistingPivot($ticket->id, ['screenshot' => $path]);
+        return $ticket->update(['status' => TicketStatus::PAID->value]);
+    }
+
+    public function confirmPaid(Ticket $ticket)
+    {
+        $this->tickets()->updateExistingPivot($ticket->id, ['expires_at' => null]);
+        return $ticket->update(['status' => TicketStatus::CONFIRMED_PAID->value, 'user_id' => $this->id]);
     }
 
 

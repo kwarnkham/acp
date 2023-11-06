@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ResponseStatus;
 use App\Enums\TicketStatus;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Models\Preference;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
-
     public function index(Request $request)
     {
         $filters = $request->validate([
@@ -34,12 +36,26 @@ class TicketController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($data, $request, $ticket) {
+            $user = $request->user();
             if ($data['status'] == TicketStatus::BOOKED->value) {
-                $user = $request->user();
-                $user->tickets()->attach($ticket, ['expires_at' => now()->addMinutes(30)]);
+                abort_unless(
+                    $user->bookTicket($ticket),
+                    ResponseStatus::BAD_REQUEST->value,
+                    'Error Booking Ticket'
+                );
+            } else if ($data['status'] == TicketStatus::PAID->value) {
+                abort_unless(
+                    $user->payTicket($ticket, $data['screenshot']),
+                    ResponseStatus::BAD_REQUEST->value,
+                    'Error Paying Ticket'
+                );
+            } else if ($data['status'] == TicketStatus::CONFIRMED_PAID->value) {
+                abort_unless(
+                    $user->confirmPaid($ticket),
+                    ResponseStatus::BAD_REQUEST->value,
+                    'Error Confirm Ticket Payment'
+                );
             }
-
-            $ticket->update(['status' => $data['status']]);
         });
 
         return response()->json(['ticket' => $ticket->load(['item'])]);

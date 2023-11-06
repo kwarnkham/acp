@@ -2,14 +2,28 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ResponseStatus;
 use App\Enums\TicketStatus;
 use App\Models\Item;
+use App\Models\Preference;
+use App\Models\Role;
 use App\Models\Ticket;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class TicketTest extends TestCase
 {
+    private $user;
+    public function setUp(): void
+    {
+        parent::setUp();
+        /** @var \Illuminate\Contracts\Auth\Authenticatable */
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+    }
     public function test_create_item_also_create_tickets(): void
     {
         $maxTickets = $this->faker->numberBetween(10, 100);
@@ -73,8 +87,152 @@ class TicketTest extends TestCase
                     ->where('item_id', $item->id)
                     ->where('user_id', $needle->user_id)
                     ->has('item')
-
             )
         );
+    }
+
+    public function test_book_a_ticket()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $response = $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ]);
+
+        $response->assertOk()->assertJsonPath('ticket.status', TicketStatus::BOOKED->value);
+    }
+
+
+    public function test_a_booked_ticket_will_expires_and_status_will_change_back_to_available()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $response = $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ]);
+
+        $response->assertOk();
+        $this->assertDatabaseCount('ticket_user', 1);
+        $expiresAt = new Carbon($ticket->users()->first()->pivot->expires_at);
+        $this->assertNotNull($expiresAt);
+
+        $this->assertTrue(now()->lessThan($expiresAt));
+
+        $this->travel(Preference::first()->ticket_expiration)->minutes();
+
+        $this->assertTrue(now()->greaterThanOrEqualTo($expiresAt));
+
+        $this->assertEquals($ticket->status, TicketStatus::AVAILABLE->value);
+    }
+
+    public function test_can_only_book_an_available_ticket()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $this->assertEquals($ticket->status, TicketStatus::AVAILABLE->value);
+        $response = $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ]);
+        $ticket->refresh();
+        $this->assertEquals($ticket->status, TicketStatus::BOOKED->value);
+        $response->assertOk();
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->payTicket($ticket, UploadedFile::fake()->image('foo.png')));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->confirmPaid($ticket));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::BOOKED->value
+        ])->assertBadRequest();
+    }
+
+    public function test_can_only_pay_an_booked_ticket()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $image = UploadedFile::fake()->image($this->faker->name() . '.png');
+        $this->assertEquals($ticket->status, TicketStatus::AVAILABLE->value);
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::PAID->value,
+            'screenshot' => $image
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->bookTicket($ticket));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::PAID->value,
+            'screenshot' => $image
+        ])->assertOk();
+
+        $this->assertEquals($ticket->fresh()->status, TicketStatus::PAID->value);
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::PAID->value,
+            'screenshot' => $image
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->confirmPaid($ticket));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::PAID->value,
+            'screenshot' => $image
+        ])->assertBadRequest();
+    }
+
+    public function test_can_only_confirm_paid_a_paid_ticket()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $admin = User::whereRelation('roles', 'role_id', '=', Role::query()->where('name', 'admin')->first()->id)->first();
+
+        $this->assertEquals($ticket->status, TicketStatus::AVAILABLE->value);
+        $this->actingAs($admin)->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->bookTicket($ticket));
+        $this->actingAs($admin)->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertBadRequest();
+
+        $this->assertTrue($this->user->payTicket($ticket, UploadedFile::fake()->image('foo.png')));
+
+        $this->actingAs($admin)->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertOk();
+
+        $this->assertEquals($ticket->fresh()->status, TicketStatus::CONFIRMED_PAID->value);
+
+        $this->actingAs($admin)->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertBadRequest();
+    }
+
+    public function test_only_admin_can_confirm_payment()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $admin = User::whereRelation('roles', 'role_id', '=', Role::query()->where('name', 'admin')->first()->id)->first();
+        $this->assertTrue($this->user->bookTicket($ticket));
+        $this->assertTrue($this->user->payTicket($ticket, UploadedFile::fake()->image('foo.png')));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertStatus(ResponseStatus::UNAUTHORIZED->value);
+
+        $this->actingAs($admin)->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::CONFIRMED_PAID->value
+        ])->assertOk();
+
+        $this->assertEquals($ticket->fresh()->status, TicketStatus::CONFIRMED_PAID->value);
     }
 }
