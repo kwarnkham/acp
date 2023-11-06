@@ -9,4 +9,9 @@ class Item extends BaseModel
     {
         return $this->hasMany(Ticket::class);
     }
+
+    public function pictures()
+    {
+        return $this->hasMany(Picture::class);
+    }
 }

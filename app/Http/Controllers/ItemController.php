@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\ResponseStatus;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Storage;
 
 class ItemController extends Controller
 {
@@ -14,10 +16,27 @@ class ItemController extends Controller
             'name' => ['required'],
             'max_tickets' => ['required', 'max:1000', 'numeric'],
             'price_per_ticket' => ['required', 'min:0', 'numeric'],
-            'price' => ['required', 'min:0', 'numeric']
+            'price' => ['required', 'min:0', 'numeric'],
+            'pictures' => ['sometimes', 'required', 'array'],
+            'pictures.*' => ['sometimes', 'required', 'image']
         ]);
 
-        $item = Item::create($data);
+        $item = DB::transaction(function () use ($data, $request) {
+            $item = Item::create([
+                'name' => $data['name'],
+                'max_tickets' => $data['max_tickets'],
+                'price_per_ticket' => $data['price_per_ticket'],
+                'price' => $data['price'],
+            ]);
+
+            if ($request->exists('pictures')) {
+                foreach ($data['pictures'] as $picture) {
+                    $path = Storage::putFile('items', $picture);
+                    $item->pictures()->create(['name' => $path]);
+                }
+            }
+            return $item;
+        });
 
         return response()->json(['item' => $item->fresh()], ResponseStatus::CREATED->value);
     }

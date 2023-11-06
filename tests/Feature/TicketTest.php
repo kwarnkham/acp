@@ -24,7 +24,6 @@ class TicketTest extends TestCase
         /** @var \Illuminate\Contracts\Auth\Authenticatable */
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
-        Storage::fake('test');
     }
     public function test_create_item_also_create_tickets(): void
     {

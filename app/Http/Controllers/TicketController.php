@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\ResponseStatus;
 use App\Enums\TicketStatus;
 use App\Http\Requests\UpdateTicketRequest;
-use App\Models\Preference;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
