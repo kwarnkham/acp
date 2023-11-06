@@ -11,6 +11,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -23,6 +24,7 @@ class TicketTest extends TestCase
         /** @var \Illuminate\Contracts\Auth\Authenticatable */
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
+        Storage::fake('test');
     }
     public function test_create_item_also_create_tickets(): void
     {
@@ -173,6 +175,8 @@ class TicketTest extends TestCase
             'screenshot' => $image
         ])->assertOk();
 
+        Storage::disk('test')->assertExists($this->user->tickets()->wherePivot('ticket_id', $ticket->id)->first()->pivot->screenshot);
+
         $this->assertEquals($ticket->fresh()->status, TicketStatus::PAID->value);
 
         $this->putJson("api/tickets/$ticket->id", [
@@ -234,5 +238,30 @@ class TicketTest extends TestCase
         ])->assertOk();
 
         $this->assertEquals($ticket->fresh()->status, TicketStatus::CONFIRMED_PAID->value);
+    }
+
+    public function test_a_screenshot_is_stored_when_pay_for_ticket()
+    {
+        $item = Item::factory()->state(['max_tickets' => 10])->create();
+        $ticket = $item->tickets()->inRandomOrder()->first();
+        $image = UploadedFile::fake()->image($this->faker->name() . '.png');
+        $this->assertEquals($ticket->status, TicketStatus::AVAILABLE->value);
+
+        $this->assertTrue($this->user->bookTicket($ticket));
+
+        $this->putJson("api/tickets/$ticket->id", [
+            'status' => TicketStatus::PAID->value,
+            'screenshot' => $image
+        ])->assertOk();
+
+        Storage::disk('test')->assertExists(
+            $this->user->tickets()
+                ->wherePivot('ticket_id', $ticket->id)
+                ->wherePivot('expires_at', '>', now())
+                ->latest('id')
+                ->first()
+                ->pivot
+                ->screenshot
+        );
     }
 }

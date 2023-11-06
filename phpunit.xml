@@ -27,7 +27,7 @@
         <env name="QUEUE_CONNECTION" value="sync" />
         <env name="SESSION_DRIVER" value="array" />
         <env name="TELESCOPE_ENABLED" value="false" />
-        <env name="AWS_URL" value="https://files.jjdhkpc.com/acp-test" />
-        <env name="AWS_BUCKET" value="acp-test" />
+        <env name="FILESYSTEM_DISK" value="test" />
+
     </php>
 </phpunit>
