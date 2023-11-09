@@ -27,12 +27,17 @@ namespace App\Models{
  *
  * @property int $id
  * @property string $name
+ * @property string|null $description
  * @property int $max_tickets
  * @property int $price_per_ticket
  * @property int $price
  * @property string|null $note
+ * @property int|null $ticket_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Picture> $pictures
+ * @property-read int|null $pictures_count
+ * @property-read \App\Models\Ticket|null $ticket
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ticket> $tickets
  * @property-read int|null $tickets_count
  * @method static \Database\Factories\ItemFactory factory($count = null, $state = [])
@@ -40,15 +45,57 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Item newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Item query()
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Item whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereMaxTickets($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereNote($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item wherePricePerTicket($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Item whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Item whereUpdatedAt($value)
  */
 	class Item extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Picture
+ *
+ * @property int $id
+ * @property int $item_id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Picture whereUpdatedAt($value)
+ */
+	class Picture extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * App\Models\Preference
+ *
+ * @property int $id
+ * @property int|null $ticket_expiration
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference whereTicketExpiration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Preference whereUpdatedAt($value)
+ */
+	class Preference extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -77,13 +124,13 @@ namespace App\Models{
  * App\Models\Ticket
  *
  * @property int $id
- * @property int $code
  * @property int $item_id
+ * @property int $code
  * @property int $status
- * @property string|null $buyer
- * @property string|null $payment_screenshot
+ * @property int|null $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $buyer
  * @property-read \App\Models\Item $item
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
@@ -91,14 +138,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket query()
- * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereBuyer($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Ticket wherePaymentScreenshot($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Ticket whereUserId($value)
  */
 	class Ticket extends \Eloquent {}
 }

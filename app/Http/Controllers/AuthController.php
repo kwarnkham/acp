@@ -20,10 +20,36 @@ class AuthController extends Controller
         if (Hash::check($data['password'], $admin->password)) {
             $admin->tokens()->delete();
             $token = $admin->createToken('user');
-            return ['token' => $token->plainTextToken, 'user' => $admin];
+            return response()->json(['token' => $token->plainTextToken, 'user' => $admin]);
         }
 
         abort(ResponseStatus::UNAUTHENTICATED->value, 'Incorrect Password');
+    }
+
+    public function user(Request $request)
+    {
+        return response()->json(['user' => $request->user()]);
+    }
+
+    public function fbLogin(Request $request)
+    {
+        $data = $request->validate([
+            'fb_name' => ['required'],
+            'fb_id' => ['required'],
+            'email' => ['email']
+        ]);
+
+        $user = User::query()->where('fb_id', $data['fb_id'])->first();
+
+        if ($user == null) {
+            $name = User::query()->where('name', $data['fb_name'])->exists() ? $data['fb_name'] . '__' . $data['fb_id'] : $data['fb_name'];
+            $user = User::create([
+                ...$data, 'name' => $name
+            ]);
+        }
+        $user->tokens()->delete();
+        $token = $user->createToken('user');
+        return response()->json(['token' => $token->plainTextToken, 'user' => $user]);
     }
 
     public function changePassword(Request $request)

@@ -8,7 +8,6 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
-use Storage;
 
 class ItemController extends Controller
 {
@@ -20,7 +19,9 @@ class ItemController extends Controller
             'price_per_ticket' => ['required', 'min:0', 'numeric'],
             'price' => ['required', 'min:0', 'numeric'],
             'pictures' => ['sometimes', 'required', 'array'],
-            'pictures.*' => ['sometimes', 'required', 'image']
+            'pictures.*' => ['sometimes', 'required', 'image'],
+            'description' => ['sometimes'],
+            'note' => ['sometimes']
         ]);
 
         $item = DB::transaction(function () use ($data, $request) {
@@ -29,14 +30,13 @@ class ItemController extends Controller
                 'max_tickets' => $data['max_tickets'],
                 'price_per_ticket' => $data['price_per_ticket'],
                 'price' => $data['price'],
+                'description' => $data['description'],
+                'note' => $data['note']
             ]);
 
-            if ($request->exists('pictures')) {
-                foreach ($data['pictures'] as $picture) {
-                    $path = Storage::putFile('items', $picture);
-                    $item->pictures()->create(['name' => $path]);
-                }
-            }
+            if ($request->exists('pictures'))
+                $item->storePictures($data['pictures']);
+
             return $item;
         });
 
@@ -57,9 +57,20 @@ class ItemController extends Controller
     {
         $data = $request->validate([
             'name' => ['required'],
-            'price' => ['required', 'min:0', 'numeric']
+            'price_per_ticket' => ['required', 'min:0', 'numeric'],
+            'price' => ['required', 'min:0', 'numeric'],
+            'pictures' => ['sometimes', 'required', 'array'],
+            'pictures.*' => ['sometimes', 'required', 'image'],
+            'description' => ['sometimes'],
+            'note' => ['sometimes']
         ]);
-        $item->update($data);
+
+        DB::transaction(function () use ($item, $data, $request) {
+            $item->update($data);
+            if ($request->exists('pictures'))
+                $item->storePictures($data['pictures']);
+        });
+
 
         return response()->json(['item' => $item]);
     }

@@ -2,13 +2,17 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\PictureController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
+
+    Route::post('fb/login', 'fbLogin');
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('user', 'user');
         Route::post('change-password', 'changePassword');
         Route::post('logout', 'logout');
     });
@@ -32,4 +36,8 @@ Route::controller(UserController::class)->prefix('users')->group(function () {
     Route::post('', 'store');
     Route::post('login', 'login');
     Route::post('logout', 'logout');
+});
+
+Route::controller(PictureController::class)->middleware(['auth:sanctum'])->prefix('pictures')->group(function () {
+    Route::middleware(['role:admin'])->delete('{picture}', 'destroy');
 });
