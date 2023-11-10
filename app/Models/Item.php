@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\HasFilter;
 use Illuminate\Support\Facades\Storage;
 
 class Item extends BaseModel
 {
+    use HasFilter;
 
     protected $with = ['pictures'];
 

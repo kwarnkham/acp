@@ -45,7 +45,11 @@ class ItemController extends Controller
 
     public function index(Request $request)
     {
-        return response()->json(['data' => Item::query()->paginate()]);
+        $filters = $request->validate([
+            'name' => ['sometimes']
+        ]);
+        $query = Item::query()->latest('id')->filter($filters);
+        return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }
 
     public function find(Request $request, Item $item)
