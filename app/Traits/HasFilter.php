@@ -10,9 +10,34 @@ trait HasFilter
     {
         $query->when(
             $filters['name'] ?? null,
-            fn (Builder $query, $name) => $query->where(function (Builder $query) use ($name) {
-                $query->where('name', 'like', '%' . $name . '%');
-            })
+            fn (Builder $query, $name) => $query->where('name', 'like', '%' . $name . '%')
+        );
+
+        $query->when(
+            $filters['on_salse'] ?? null,
+            fn ($query) => $query->whereNull('ticket_id')
+        );
+
+        $query->when(
+            $filters['sold'] ?? null,
+            fn ($query) => $query->whereNotNull('ticket_id')
+        );
+
+        $query->when(
+            $filters['item_id'] ?? null,
+            fn ($query, $itemId) =>
+            $query->where('item_id', $itemId)
+        );
+
+        $query->when(
+            $filters['status'] ?? null,
+            fn ($query, $status) =>
+            $query->whereIn('status', explode(',', $status))
+        );
+
+        $query->when(
+            $filters['select'] ?? null,
+            fn (Builder $query, $select) =>  $query->select($select)
         );
     }
 }

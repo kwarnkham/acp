@@ -17,6 +17,7 @@ class TicketController extends Controller
         $filters = $request->validate([
             'item_id' => ['required', Rule::exists('items', 'id')],
             'status' => ['sometimes', 'required'],
+            'select' => ['sometimes', 'array']
         ]);
 
         $query = Ticket::query()->filter($filters);

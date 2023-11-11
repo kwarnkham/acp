@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\HasFilter;
 
 class Ticket extends BaseModel
 {
+    use HasFilter;
+
     public function item()
     {
         return $this->belongsTo(Item::class);
@@ -19,16 +21,5 @@ class Ticket extends BaseModel
     public function buyer()
     {
         return $this->belongsTo(User::class, 'user_id', 'id', 'buyer');
-    }
-
-    public function scopeFilter(Builder $query, array $filters)
-    {
-        $query->when($filters['item_id'] ?? null, function ($query, $itemId) {
-            $query->where('item_id', $itemId);
-        });
-
-        $query->when($filters['status'] ?? null, function ($query, $status) {
-            $query->whereIn('status', explode(',', $status));
-        });
     }
 }
