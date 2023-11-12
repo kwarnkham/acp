@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -28,7 +29,13 @@ class TicketController extends Controller
 
     public function find(Request $request, Ticket $ticket)
     {
-        return response()->json(['ticket' => $ticket->load(['item'])]);
+        $ticketUser = $ticket->users()->wherePivot('expires_at', '>', now())->first();
+        abort_unless(
+            $request->user()->isAdmin ||
+                ($ticketUser != null && $ticketUser->id == $request->user()->id),
+            ResponseStatus::UNAUTHORIZED->value
+        );
+        return response()->json(['ticket' => $ticket->load(['item'])->append('current_user')]);
     }
 
     public function book(Request $request, Ticket $ticket)

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Traits\HasFilter;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Carbon;
 
 class Ticket extends BaseModel
 {
@@ -23,6 +25,17 @@ class Ticket extends BaseModel
             'phone',
             'price'
         ])->withTimestamps();
+    }
+
+    public function currentUser(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $currentUser = $this->users()->wherePivot('expires_at', '>', now())->first();
+                $currentUser->pivot->expires_at = new Carbon($currentUser->pivot->expires_at);
+                return $currentUser;
+            }
+        );
     }
 
     public function buyer()
