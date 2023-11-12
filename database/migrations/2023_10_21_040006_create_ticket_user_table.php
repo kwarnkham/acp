@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('ticket_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ticket_id')->constrained();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->nullable()->constrained();
             $table->timestamp('expires_at')->default(now());
             $table->string('screenshot')->nullable();
             $table->double('price');
+            $table->string('phone');
             $table->timestamps();
         });
     }

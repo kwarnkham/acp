@@ -6,6 +6,7 @@ use App\Enums\ResponseStatus;
 use App\Enums\TicketStatus;
 use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -28,6 +29,38 @@ class TicketController extends Controller
     public function find(Request $request, Ticket $ticket)
     {
         return response()->json(['ticket' => $ticket->load(['item'])]);
+    }
+
+    public function book(Request $request, Ticket $ticket)
+    {
+
+        $data = $request->validate([
+            'phone' => ['required']
+        ]);
+
+        DB::transaction(function () use ($request, $data, $ticket) {
+            $user = $request->user();
+
+            if ($user->isAdmin) {
+                $user = User::query()->firstOrCreate([
+                    'phone' => $data['phone'],
+                    'name' => $data['phone']
+                ]);
+            }
+
+            $ticket->update(['status' => TicketStatus::BOOKED->value]);
+
+            $ticket->users()->attach(
+                $user->id,
+                [
+                    'phone' => $data['phone'],
+                    'expires_at' => now()->addMinutes($ticket->item->expires_in),
+                    'price' => $ticket->item->price_per_ticket
+                ]
+            );
+        });
+
+        return response()->json(['ticket' => $ticket]);
     }
 
     public function update(UpdateTicketRequest $request, Ticket $ticket)

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('price');
             $table->string('note')->nullable();
             $table->foreignId('ticket_id')->unique()->nullable();
+            $table->unsignedInteger('expires_in')->default(60);
             $table->timestamps();
         });
     }

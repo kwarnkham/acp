@@ -30,6 +30,7 @@ Route::controller(TicketController::class)->middleware(['auth:sanctum'])->prefix
     Route::get('', 'index');
     Route::get('{ticket}', 'find');
     Route::put('{ticket}', 'update');
+    Route::post('{ticket}/book', 'book');
 });
 
 Route::controller(UserController::class)->prefix('users')->group(function () {

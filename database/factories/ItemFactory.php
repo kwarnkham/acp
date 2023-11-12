@@ -21,7 +21,8 @@ class ItemFactory extends Factory
             'max_tickets' => fake()->numberBetween(10, 9999),
             'price_per_ticket' => fake()->numberBetween(10000, 99999),
             'price' => fake()->numberBetween(10000, 1000000),
-            'note' => fake()->sentence()
+            'note' => fake()->sentence(),
+            'expires_in' => fake()->numberBetween(30, 600)
         ];
     }
 }

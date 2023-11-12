@@ -15,7 +15,14 @@ class Ticket extends BaseModel
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot(['expires_at', 'screenshot', 'id']);
+        return $this->belongsToMany(User::class)->withPivot([
+            'expires_at',
+            'screenshot',
+            'id',
+            'phone',
+            'phone',
+            'price'
+        ])->withTimestamps();
     }
 
     public function buyer()
