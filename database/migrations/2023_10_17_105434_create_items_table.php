@@ -15,12 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->unsignedInteger('max_tickets');
-            $table->unsignedBigInteger('price_per_ticket');
-            $table->unsignedBigInteger('price');
-            $table->string('note')->nullable();
-            $table->foreignId('ticket_id')->unique()->nullable();
-            $table->unsignedInteger('expires_in')->default(60);
             $table->timestamps();
         });
     }

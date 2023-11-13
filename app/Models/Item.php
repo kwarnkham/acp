@@ -11,20 +11,21 @@ class Item extends BaseModel
 
     protected $with = ['pictures'];
 
-    public function tickets()
-    {
-        return $this->hasMany(Ticket::class);
-    }
-
     public function pictures()
     {
         return $this->hasMany(Picture::class);
     }
 
-    public function ticket()
+    public function rounds()
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->hasMany(Round::class);
     }
+
+    public function latestRound()
+    {
+        return $this->hasOne(Round::class)->latestOfMany();
+    }
+
 
     public function storePictures(array $pictures)
     {

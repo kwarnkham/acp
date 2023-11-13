@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Item;
-use App\Models\Ticket;
 
 class ItemObserver
 {

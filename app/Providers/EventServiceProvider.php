@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\Item;
-use App\Models\Ticket;
 use App\Observers\ItemObserver;
 use App\Observers\TicketObserver;
 use Illuminate\Auth\Events\Registered;
@@ -30,7 +29,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Item::observe(ItemObserver::class);
-        Ticket::observe(TicketObserver::class);
     }
 
     /**

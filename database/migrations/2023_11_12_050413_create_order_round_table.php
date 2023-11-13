@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\TicketStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickets', function (Blueprint $table) {
+        Schema::create('order_round', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('item_id')->constrained();
-            $table->unsignedInteger('code');
-            $table->tinyInteger('status')->default(TicketStatus::AVAILABLE->value);
-            $table->foreignId('user_id')->nullable()->constrained();
+            $table->foreignId('order_id')->constrained();
+            $table->foreignId('round_id')->constrained();
+            $table->integer('code')->constrained();
+            $table->double('price')->constrained();
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tickets');
+        Schema::dropIfExists('order_round');
     }
 };
