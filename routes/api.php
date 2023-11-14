@@ -28,8 +28,10 @@ Route::controller(ItemController::class)->middleware(['auth:sanctum'])->prefix('
 
 Route::controller(OrderController::class)->middleware(['auth:sanctum'])->prefix('orders')->group(function () {
     Route::post('', 'store');
+    Route::get('', 'index');
     Route::get('{order}', 'find');
     Route::post('{order}/pay', 'pay');
+    Route::post('{order}/cancel', 'cancel');
 });
 
 Route::controller(UserController::class)->prefix('users')->group(function () {

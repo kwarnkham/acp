@@ -30,8 +30,11 @@ namespace App\Models{
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Round|null $latestRound
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Picture> $pictures
  * @property-read int|null $pictures_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Round> $rounds
+ * @property-read int|null $rounds_count
  * @method static \Database\Factories\ItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Item filter(array $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Item newModelQuery()
@@ -52,16 +55,28 @@ namespace App\Models{
  *
  * @property int $id
  * @property int $user_id
+ * @property int $round_id
  * @property float $amount
  * @property int $status
+ * @property \Illuminate\Support\Carbon $expires_at
+ * @property string|null $note
+ * @property string|null $screenshot
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Round $round
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Round> $rounds
+ * @property-read int|null $rounds_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Order filter(array $filters)
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order query()
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereNote($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereRoundId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereScreenshot($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
@@ -143,6 +158,11 @@ namespace App\Models{
  * @property int $expires_in
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Item $item
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orderDetails
+ * @property-read int|null $order_details_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
  * @method static \Illuminate\Database\Eloquent\Builder|Round newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Round newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Round query()
@@ -174,6 +194,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens

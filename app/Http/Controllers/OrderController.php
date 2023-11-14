@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
 use App\Enums\ResponseStatus;
+use App\Jobs\ProcessExpiredOrder;
 use App\Models\Order;
 use App\Models\Round;
 use App\Models\User;
@@ -14,6 +15,16 @@ use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
+    public function index(Request $request)
+    {
+        $filters = $request->validate([
+            'round_id' => ['sometimes'],
+            'user_id' => ['sometimes']
+        ]);
+        $query = Order::query()->latest('id')->filter($filters)->with(['round.item']);
+        return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
+    }
+
     public function store(Request $request)
     {
         abort_unless($request->exists('round_id'), ResponseStatus::BAD_REQUEST->value, "No Round ID found");
@@ -24,7 +35,10 @@ class OrderController extends Controller
             'codes.*' => ['required', 'numeric', 'lt:' . $round->max_tickets],
         ]);
 
-        $codes = $round->orderDetails()->wherePivotIn('code', $data['codes'])->pluck('code');
+        $codes = $round->orderDetails()
+            ->whereNotIn('status', [OrderStatus::EXPIRED->value, OrderStatus::CANCELED->value])
+            ->wherePivotIn('code', $data['codes'])
+            ->pluck('code');
 
         abort_if(count($codes) > 0, ResponseStatus::BAD_REQUEST->value, implode(",", $codes->toArray()) . ". Number already sold out.");
 
@@ -54,6 +68,8 @@ class OrderController extends Controller
                 ]);
             }
 
+            ProcessExpiredOrder::dispatch($order->id)->delay(now()->addMinutes($round->expires_in));
+
             return $order;
         });
 
@@ -68,7 +84,9 @@ class OrderController extends Controller
 
     public function pay(Request $request, Order $order)
     {
-        abort_unless($order->status == OrderStatus::PENDING->value, ResponseStatus::BAD_REQUEST->value, 'Can only pay a pedning order');
+        abort_unless(in_array($order->status, [
+            OrderStatus::PENDING->value, OrderStatus::PAID->value
+        ]), ResponseStatus::BAD_REQUEST->value, 'Can only pay a pedning or paid order');
         $data = $request->validate([
             'picture' => ['required', 'image'],
             'note' => ['sometimes']
@@ -76,6 +94,8 @@ class OrderController extends Controller
         $user = $request->user();
 
         DB::transaction(function () use ($order, $data, $user) {
+            $path = $order->getRawOriginal('screenshot');
+            if ($path && Storage::exists($path)) Storage::delete($path);
             $path = Storage::putFile('orders', $data['picture']);
 
             $order->update([
@@ -84,6 +104,22 @@ class OrderController extends Controller
                 'screenshot' => $path
             ]);
         });
+
+        return response()->json(['order' => $order->fresh(['round.item', 'rounds'])]);
+    }
+
+    public function cancel(Request $request, Order $order)
+    {
+        abort_unless($request->user()->is_admin, ResponseStatus::UNAUTHORIZED->value);
+
+        abort_unless(in_array($order->status, [
+            OrderStatus::PENDING->value,
+            OrderStatus::PAID->value
+        ]), ResponseStatus::BAD_REQUEST->value, 'Can only cancel a pending or paid order');
+
+        $order->update([
+            'status' => OrderStatus::CANCELED->value,
+        ]);
 
         return response()->json(['order' => $order->fresh(['round.item', 'rounds'])]);
     }

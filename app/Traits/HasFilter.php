@@ -39,5 +39,17 @@ trait HasFilter
             $filters['select'] ?? null,
             fn (Builder $query, $select) =>  $query->select($select)
         );
+
+        $query->when(
+            $filters['round_id'] ?? null,
+            fn ($query, $roundId) =>
+            $query->where('round_id', $roundId)
+        );
+
+        $query->when(
+            $filters['user_id'] ?? null,
+            fn ($query, $userId) =>
+            $query->where('user_id', $userId)
+        );
     }
 }
