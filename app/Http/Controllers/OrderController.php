@@ -10,8 +10,8 @@ use App\Models\Round;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -32,12 +32,16 @@ class OrderController extends Controller
         $data = $request->validate([
             'phone' => ['required'],
             'codes' => ['required', 'array'],
-            'codes.*' => ['required', 'numeric', 'lt:' . $round->max_tickets],
+            'codes.*' => ['required', 'numeric', 'lte:' . $round->max_tickets],
         ]);
+
+        $codes = array_map(fn ($val) => ($val - 1), $data['codes']);
+
+        Log::info($codes);
 
         $codes = $round->orderDetails()
             ->whereNotIn('status', [OrderStatus::EXPIRED->value, OrderStatus::CANCELED->value])
-            ->wherePivotIn('code', $data['codes'])
+            ->wherePivotIn('code', $codes)
             ->pluck('code');
 
         abort_if(count($codes) > 0, ResponseStatus::BAD_REQUEST->value, implode(",", $codes->toArray()) . ". Number already sold out.");
