@@ -27,11 +27,14 @@ Route::controller(ItemController::class)->middleware(['auth:sanctum'])->prefix('
     Route::post('{item}/result', 'result');
 });
 
-Route::controller(RoundController::class)->middleware(['auth:sanctum'])->prefix('rounds')->group(function () {
-    Route::post('', 'store');
-    Route::get('', 'index');
+Route::controller(RoundController::class)->prefix('rounds')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('', 'store');
+        Route::get('', 'index');
+        Route::put('{round}', 'update');
+    });
+
     Route::get('{round}', 'find');
-    Route::put('{round}', 'update');
 });
 
 Route::controller(OrderController::class)->middleware(['auth:sanctum'])->prefix('orders')->group(function () {
