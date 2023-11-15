@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\RoundStatus;
+use App\Models\Ticket;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,6 +16,8 @@ return new class extends Migration
         Schema::create('rounds', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained();
+            $table->foreignIdFor(Ticket::class, 'ticket_id')->nullable();
+            $table->tinyInteger('status')->default(RoundStatus::ONGOING->value);
             $table->unsignedInteger('max_tickets');
             $table->unsignedBigInteger('price_per_ticket');
             $table->unsignedBigInteger('price');

@@ -14,7 +14,10 @@ class Round extends Model
 
     public function orderDetails()
     {
-        return $this->belongsToMany(Order::class)->using(Ticket::class)->withTimestamps()->withPivot(['code', 'price']);
+        return $this->belongsToMany(Order::class)
+            ->using(Ticket::class)
+            ->withTimestamps()
+            ->withPivot(['code', 'price', 'id']);
     }
 
     public function orders()
@@ -25,5 +28,10 @@ class Round extends Model
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
     }
 }

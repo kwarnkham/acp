@@ -35,6 +35,7 @@ Route::controller(RoundController::class)->prefix('rounds')->group(function () {
     });
 
     Route::get('{round}', 'find');
+    Route::post('{round}/settle', 'settle');
 });
 
 Route::controller(OrderController::class)->middleware(['auth:sanctum'])->prefix('orders')->group(function () {

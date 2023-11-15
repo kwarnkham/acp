@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Enums\ResponseStatus;
+use App\Enums\RoundStatus;
 use App\Models\Round;
 use Illuminate\Http\Request;
 
@@ -20,7 +23,7 @@ class RoundController extends Controller
 
         $round = Round::create($data);
 
-        return response()->json(['round' => $round]);
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
 
     public function update(Request $request, Round $round)
@@ -39,12 +42,38 @@ class RoundController extends Controller
             'expires_in' => $data['expires_in'],
         ]);
 
-        return response()->json(['round' => $round]);
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
+    }
+
+    public function settle(Request $request, Round $round)
+    {
+        $data = $request->validate([
+            'code' => ['required', 'numeric', 'gte:0', 'lt:' . $round->max_tickets]
+        ]);
+
+        $order = $round
+            ->orderDetails()
+            ->where('status', OrderStatus::CONFIRMED_PAID->value)
+            ->wherePivot('code', $data['code'])
+            ->get();
+
+        abort_if(count($order) > 1, ResponseStatus::BAD_REQUEST->value, 'Cannot determine the order');
+
+        if (count($order) == 1)
+            $round->update([
+                'ticket_id' => $order->first()->pivot->id,
+                'status' => RoundStatus::SETTLED->value,
+            ]);
+
+        else $round->update(['status' => RoundStatus::SETTLED->value]);
+
+
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
 
     public function find(Request $request, Round $round)
     {
-        return response()->json(['round' => $round->load(['item', 'orderDetails'])]);
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
 
     public function index(Request $request)

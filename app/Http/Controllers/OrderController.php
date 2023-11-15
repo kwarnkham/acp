@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
 use App\Enums\ResponseStatus;
+use App\Enums\RoundStatus;
 use App\Jobs\ProcessExpiredOrder;
 use App\Models\Order;
 use App\Models\Round;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
@@ -35,13 +35,9 @@ class OrderController extends Controller
             'codes.*' => ['required', 'numeric', 'lte:' . $round->max_tickets],
         ]);
 
-        $codes = array_map(fn ($val) => ($val - 1), $data['codes']);
-
-        Log::info($codes);
-
         $codes = $round->orderDetails()
             ->whereNotIn('status', [OrderStatus::EXPIRED->value, OrderStatus::CANCELED->value])
-            ->wherePivotIn('code', $codes)
+            ->wherePivotIn('code', $data['codes'])
             ->pluck('code');
 
         abort_if(count($codes) > 0, ResponseStatus::BAD_REQUEST->value, implode(",", $codes->toArray()) . ". Number already sold out.");
@@ -66,8 +62,8 @@ class OrderController extends Controller
             ]);
 
             foreach ($data['codes'] as $code) {
-                $order->rounds()->attach($round->id, [
-                    'code' => $code - 1,
+                $order->tickets()->attach($round->id, [
+                    'code' => $code,
                     'price' => $round->price_per_ticket
                 ]);
             }
@@ -83,7 +79,7 @@ class OrderController extends Controller
 
     public function find(Request $request, Order $order)
     {
-        return response()->json(['order' => $order->load(['round.item', 'rounds', 'user'])]);
+        return response()->json(['order' => $order->load(['round.item', 'tickets', 'user'])]);
     }
 
     public function pay(Request $request, Order $order)
@@ -91,6 +87,11 @@ class OrderController extends Controller
         abort_unless(in_array($order->status, [
             OrderStatus::PENDING->value, OrderStatus::PAID->value
         ]), ResponseStatus::BAD_REQUEST->value, 'Can only pay a pedning or paid order');
+
+        abort_unless($order->round->status == RoundStatus::ONGOING->value, ResponseStatus::BAD_REQUEST->value, 'Round has been already settled');
+
+        abort_unless(in_array($order->status, [OrderStatus::PENDING->value, OrderStatus::PAID->value]), ResponseStatus::BAD_REQUEST->value, 'Cannot pay anymore');
+
         $data = $request->validate([
             'picture' => ['required', 'image'],
             'note' => ['sometimes']
@@ -109,7 +110,7 @@ class OrderController extends Controller
             ]);
         });
 
-        return response()->json(['order' => $order->fresh(['round.item', 'rounds'])]);
+        return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);
     }
 
     public function cancel(Request $request, Order $order)
@@ -125,6 +126,6 @@ class OrderController extends Controller
             'status' => OrderStatus::CANCELED->value,
         ]);
 
-        return response()->json(['order' => $order->fresh(['round.item', 'rounds'])]);
+        return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);
     }
 }

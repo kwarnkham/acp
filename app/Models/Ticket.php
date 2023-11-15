@@ -11,11 +11,5 @@ class Ticket extends Pivot
 {
     use HasFactory;
 
-    public function code(): Attribute
-    {
-        return Attribute::make(
-            set: fn ($value) => $value - 1,
-            get: fn ($value) => $value + 1
-        );
-    }
+    protected $table = 'order_round';
 }

@@ -18,9 +18,12 @@ class Order extends Model
         'expires_at' => 'datetime'
     ];
 
-    public function rounds()
+    public function tickets()
     {
-        return $this->belongsToMany(Round::class)->withTimestamps()->withPivot(['code', 'price']);
+        return $this->belongsToMany(Round::class)
+            ->using(Ticket::class)
+            ->withTimestamps()
+            ->withPivot(['code', 'price', 'id']);
     }
 
     public function user()
