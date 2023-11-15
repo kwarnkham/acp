@@ -21,7 +21,7 @@ class OrderController extends Controller
             'round_id' => ['sometimes'],
             'user_id' => ['sometimes']
         ]);
-        $query = Order::query()->latest('id')->filter($filters)->with(['round.item']);
+        $query = Order::query()->latest('id')->filter($filters)->with(['round.item', 'user']);
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }
 
@@ -63,7 +63,7 @@ class OrderController extends Controller
 
             foreach ($data['codes'] as $code) {
                 $order->rounds()->attach($round->id, [
-                    'code' => $code,
+                    'code' => $code - 1,
                     'price' => $round->price_per_ticket
                 ]);
             }
@@ -79,7 +79,7 @@ class OrderController extends Controller
 
     public function find(Request $request, Order $order)
     {
-        return response()->json(['order' => $order->load(['round.item', 'rounds'])]);
+        return response()->json(['order' => $order->load(['round.item', 'rounds', 'user'])]);
     }
 
     public function pay(Request $request, Order $order)

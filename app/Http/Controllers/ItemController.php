@@ -14,29 +14,16 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => ['required'],
-            'max_tickets' => ['required', 'max:1000', 'numeric'],
-            'price_per_ticket' => ['required', 'min:0', 'numeric'],
-            'price' => ['required', 'min:0', 'numeric'],
+            'name' => ['required', 'unique:items'],
+            'description' => ['sometimes'],
             'pictures' => ['sometimes', 'required', 'array'],
             'pictures.*' => ['sometimes', 'required', 'image'],
-            'description' => ['sometimes'],
-            'note' => ['sometimes'],
-            'expires_in' => ['sometimes', 'numeric']
         ]);
 
         $item = DB::transaction(function () use ($data, $request) {
             $item = Item::create([
                 'name' => $data['name'],
                 'description' => $data['description'],
-            ]);
-
-            $item->rounds()->create([
-                'max_tickets' => $data['max_tickets'],
-                'price_per_ticket' => $data['price_per_ticket'],
-                'price' => $data['price'],
-                'note' => $data['note'],
-                'exires_in' => $data['expires_in'] ?? 60
             ]);
 
             if ($request->exists('pictures'))
@@ -66,13 +53,10 @@ class ItemController extends Controller
     {
         $data = $request->validate([
             'name' => ['required'],
-            'price_per_ticket' => ['required', 'min:0', 'numeric'],
-            'price' => ['required', 'min:0', 'numeric'],
             'pictures' => ['sometimes', 'required', 'array'],
             'pictures.*' => ['sometimes', 'required', 'image'],
             'description' => ['sometimes'],
-            'note' => ['sometimes'],
-            'expires_in' => ['required', 'numeric']
+
         ]);
 
         DB::transaction(function () use ($item, $data, $request) {
@@ -80,16 +64,10 @@ class ItemController extends Controller
                 'name' => $data['name'],
                 'description' => $data['description']
             ]);
-            $item->latestRound()->update([
-                'price_per_ticket' => $data['price_per_ticket'],
-                'price' => $data['price'],
-                'note' => $data['note'],
-                'expires_in' => $data['expires_in'],
-            ]);
+
             if ($request->exists('pictures'))
                 $item->storePictures($data['pictures']);
         });
-
 
         return response()->json(['item' => $item]);
     }

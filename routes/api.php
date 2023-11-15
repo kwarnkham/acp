@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PictureController;
+use App\Http\Controllers\RoundController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,13 @@ Route::controller(ItemController::class)->middleware(['auth:sanctum'])->prefix('
     Route::get('{item}', 'find');
     Route::put('{item}', 'update');
     Route::post('{item}/result', 'result');
+});
+
+Route::controller(RoundController::class)->middleware(['auth:sanctum'])->prefix('rounds')->group(function () {
+    Route::post('', 'store');
+    Route::get('', 'index');
+    Route::get('{round}', 'find');
+    Route::put('{round}', 'update');
 });
 
 Route::controller(OrderController::class)->middleware(['auth:sanctum'])->prefix('orders')->group(function () {

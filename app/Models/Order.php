@@ -23,6 +23,11 @@ class Order extends Model
         return $this->belongsToMany(Round::class)->withTimestamps()->withPivot(['code', 'price']);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function round()
     {
         return $this->belongsTo(Round::class);
