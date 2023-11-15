@@ -67,7 +67,6 @@ class RoundController extends Controller
 
         else $round->update(['status' => RoundStatus::SETTLED->value]);
 
-
         return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
 
@@ -81,7 +80,7 @@ class RoundController extends Controller
         $filters = $request->validate([
             'item_id' => ['sometimes']
         ]);
-        $query = Round::query()->latest('id')->with(['item'])->filter($filters);
+        $query = Round::query()->latest('id')->with(['item', 'ticket'])->filter($filters);
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }
 }
