@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('fb_name')->nullable();
             $table->string('password')->nullable();
             $table->timestamps();
+            $table->string('display_name')->nullable();
         });
     }
 

@@ -21,18 +21,20 @@ class OrderController extends Controller
             'round_id' => ['sometimes'],
             'user_id' => ['sometimes']
         ]);
+        if (!$request->user()->is_admin) $filters['user_id'] = $request->user()->id;
         $query = Order::query()->latest('id')->filter($filters)->with(['round.item', 'user']);
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }
 
     public function store(Request $request)
     {
-        abort_unless($request->exists('round_id'), ResponseStatus::BAD_REQUEST->value, "No Round ID found");
         $round = Round::query()->findOrFail($request->round_id);
         $data = $request->validate([
+            'round_id' => ['required', 'exists:rounds,id'],
             'phone' => ['required'],
             'codes' => ['required', 'array'],
             'codes.*' => ['required', 'numeric', 'lte:' . $round->max_tickets],
+            'name' => ['required']
         ]);
 
         $codes = $round->orderDetails()
@@ -43,16 +45,20 @@ class OrderController extends Controller
         abort_if(count($codes) > 0, ResponseStatus::BAD_REQUEST->value, implode(",", $codes->toArray()) . ". Number already sold out.");
 
         $order = DB::transaction(function () use ($request, $data, $round) {
-            $user = $request->user();
+            $user = User::query()->where('name', $data['phone'])->first();
+            if (!$user) $user = User::create([
+                'name' => $data['phone'],
+                'phone' => $data['phone'],
+                'display_name' => $data['name'],
+                'password' => $data['phone']
+            ]);
 
-            if ($user->is_admin) {
-                $user = User::query()->createOrFirst([
-                    'name' => $data['phone'],
-                    'phone' => $data['phone'],
-                ]);
-
-                $user->password = bcrypt($data['phone']);
-                $user->save();
+            else {
+                if (!$request->user()) {
+                    abort(ResponseStatus::BAD_REQUEST->value, "Phone number already exists");
+                }
+                if (!$request->user()->isAdmin)
+                    if ($request->user()->phone != $user->phone) abort(ResponseStatus::BAD_REQUEST->value, "Phone number does not match");
             }
 
             $order = $user->orders()->create([
