@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Enums\ResponseStatus;
 use App\Enums\RoundStatus;
+use App\Events\OrderUpdated;
 use App\Jobs\NotifyAdmin;
 use App\Jobs\ProcessExpiredOrder;
 use App\Models\Order;
