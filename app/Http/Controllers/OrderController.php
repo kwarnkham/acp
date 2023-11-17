@@ -96,12 +96,11 @@ class OrderController extends Controller
 
         abort_unless($order->round->status == RoundStatus::ONGOING->value, ResponseStatus::BAD_REQUEST->value, 'Round has been already settled');
 
-        abort_unless(in_array($order->status, [OrderStatus::PENDING->value, OrderStatus::PAID->value]), ResponseStatus::BAD_REQUEST->value, 'Cannot pay anymore');
-
         $data = $request->validate([
             'picture' => ['required', 'image'],
             'note' => ['sometimes']
         ]);
+
         $user = $request->user();
 
         DB::transaction(function () use ($order, $data, $user) {
@@ -130,6 +129,21 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::CANCELED->value,
+        ]);
+
+        return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);
+    }
+
+    public function confirm(Request $request, Order $order)
+    {
+        abort_unless($request->user()->is_admin, ResponseStatus::UNAUTHORIZED->value);
+
+        abort_unless(in_array($order->status, [
+            OrderStatus::PAID->value
+        ]), ResponseStatus::BAD_REQUEST->value, 'Can only confirm a paid order');
+
+        $order->update([
+            'status' => OrderStatus::CONFIRMED_PAID->value,
         ]);
 
         return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);

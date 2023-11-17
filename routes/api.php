@@ -46,6 +46,7 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
         Route::get('{order}', 'find');
         Route::post('{order}/pay', 'pay');
         Route::post('{order}/cancel', 'cancel');
+        Route::post('{order}/confirm', 'confirm');
     });
 });
 
