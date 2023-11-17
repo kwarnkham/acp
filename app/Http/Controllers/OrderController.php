@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Enums\ResponseStatus;
 use App\Enums\RoundStatus;
+use App\Jobs\NotifyAdmin;
 use App\Jobs\ProcessExpiredOrder;
 use App\Models\Order;
 use App\Models\Round;
@@ -110,9 +111,11 @@ class OrderController extends Controller
 
             $order->update([
                 'status' => $user->is_admin ? OrderStatus::CONFIRMED_PAID->value : OrderStatus::PAID->value,
-                'note' => $data['note'],
+                'note' => $data['note'] ?? '',
                 'screenshot' => $path
             ]);
+
+            NotifyAdmin::dispatch($order->id);
         });
 
         return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);

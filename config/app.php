@@ -20,6 +20,8 @@ return [
 
     'telegram_bot_token' => env('TELEGRAM_BOT_TOKEN', null),
 
+    'frontend_url' => env('FRONTEND_URL', null),
+
 
     /*
     |--------------------------------------------------------------------------
