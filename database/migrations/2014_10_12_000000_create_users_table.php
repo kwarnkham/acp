@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->timestamps();
             $table->string('display_name')->nullable();
+            $table->string('telegram_chat_id')->nullable();
         });
     }
 

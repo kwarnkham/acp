@@ -3,8 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PictureController;
 use App\Http\Controllers\RoundController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,4 +60,19 @@ Route::controller(UserController::class)->prefix('users')->group(function () {
 
 Route::controller(PictureController::class)->middleware(['auth:sanctum'])->prefix('pictures')->group(function () {
     Route::middleware(['role:admin'])->delete('{picture}', 'destroy');
+});
+
+Route::controller(ServiceController::class)->prefix('services')->group(function () {
+    Route::post('telegram', 'telegram');
+});
+
+Route::controller(PaymentMethodController::class)->middleware(['auth:sanctum'])->prefix('payment-methods')->group(function () {
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('', 'store');
+        Route::post('{paymentMethod}/toggle', 'toggle');
+        Route::get('{paymentMethod}', 'find');
+        Route::put('{paymentMethod}', 'update');
+    });
+
+    Route::get('', 'index');
 });
