@@ -71,22 +71,4 @@ class ItemController extends Controller
 
         return response()->json(['item' => $item]);
     }
-
-    public function result(Request $request, Item $item)
-    {
-        $data = $request->validate([
-            'ticket_id' => [
-                'required',
-                Rule::exists('tickets', 'id')->where(
-                    fn (Builder $query) => $query->where('item_id', $item->id)
-                )
-            ],
-        ]);
-
-        $item->update([
-            'ticket_id' => $data['ticket_id']
-        ]);
-
-        return response()->json(['item' => $item]);
-    }
 }
