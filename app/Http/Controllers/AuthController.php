@@ -18,7 +18,7 @@ class AuthController extends Controller
 
         $admin = User::query()->where('name', $data['name'])->first();
         if (Hash::check($data['password'], $admin->password)) {
-            // $admin->tokens()->delete();
+            $admin->tokens()->delete();
             $token = $admin->createToken('user');
             return response()->json(['token' => $token->plainTextToken, 'user' => $admin]);
         }
