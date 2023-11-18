@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained();
             $table->foreignId('round_id')->constrained();
-            $table->integer('code')->constrained();
-            $table->double('price')->constrained();
+            $table->integer('code');
+            $table->double('price');
             $table->timestamps();
         });
     }

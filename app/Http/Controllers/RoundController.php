@@ -51,6 +51,14 @@ class RoundController extends Controller
             'code' => ['required', 'numeric', 'gte:0', 'lt:' . $round->max_tickets]
         ]);
 
+        abort_if(
+            $round->orders()
+                ->whereIn('status', [OrderStatus::PENDING->value, OrderStatus::PAID->value])
+                ->exists(),
+            ResponseStatus::BAD_REQUEST->value,
+            'There are still unfinished orders'
+        );
+
         $order = $round
             ->orderDetails()
             ->where('status', OrderStatus::CONFIRMED_PAID->value)
@@ -59,13 +67,12 @@ class RoundController extends Controller
 
         abort_if(count($order) > 1, ResponseStatus::BAD_REQUEST->value, 'Cannot determine the order');
 
-        if (count($order) == 1)
-            $round->update([
-                'ticket_id' => $order->first()->pivot->id,
-                'status' => RoundStatus::SETTLED->value,
-            ]);
 
-        else $round->update(['status' => RoundStatus::SETTLED->value]);
+        $round->update([
+            'ticket_id' => count($order) == 1 ? $order->first()->pivot->id : null,
+            'status' => RoundStatus::SETTLED->value,
+            'code' => $data['code']
+        ]);
 
         return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }

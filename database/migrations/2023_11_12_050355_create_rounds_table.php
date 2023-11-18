@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->unsignedInteger('expires_in')->default(60);
             $table->timestamps();
+            $table->integer('code')->nullable();
         });
     }
 
