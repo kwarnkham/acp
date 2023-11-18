@@ -21,10 +21,19 @@ class OrderController extends Controller
     {
         $filters = $request->validate([
             'round_id' => ['sometimes'],
-            'user_id' => ['sometimes']
+            'user_id' => ['sometimes'],
+            'phone' => ['sometimes']
         ]);
+
         if (!$request->user()->is_admin) $filters['user_id'] = $request->user()->id;
-        $query = Order::query()->latest('id')->filter($filters)->with(['round.item', 'user']);
+
+        $query = Order::query()
+            ->latest('id')
+            ->filter($filters)
+            ->with(['round.item', 'user']);
+
+        if ($request->exists('phone')) $query->whereRelation('user', 'name', 'like', '%' . $filters['phone'] . '%');
+
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }
 
