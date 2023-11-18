@@ -24,6 +24,7 @@ class Telegram
 
     public static function sendMessage($chatId, $text, $parseMode = 'HTML')
     {
+        if (!$chatId || !$text) return;
         $token = config('app.telegram_bot_token');
         if (!$token) return null;
         return Http::post("https://api.telegram.org/bot$token/sendmessage", [

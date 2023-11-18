@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('account_name');
             $table->tinyInteger('status')->default(PaymentMethodStatus::OPEN->value);
             $table->timestamps();
+            $table->string('picture')->nullable();
         });
     }
 
