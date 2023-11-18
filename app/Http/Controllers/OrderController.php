@@ -22,7 +22,8 @@ class OrderController extends Controller
         $filters = $request->validate([
             'round_id' => ['sometimes'],
             'user_id' => ['sometimes'],
-            'phone' => ['sometimes']
+            'phone' => ['sometimes'],
+            'status' => ['sometimes']
         ]);
 
         if (!$request->user()->is_admin) $filters['user_id'] = $request->user()->id;
