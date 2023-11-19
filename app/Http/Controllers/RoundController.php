@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Enums\ResponseStatus;
 use App\Enums\RoundStatus;
+use App\Events\RoundUpdated;
 use App\Models\Round;
 use Illuminate\Http\Request;
 
@@ -73,6 +74,8 @@ class RoundController extends Controller
             'status' => RoundStatus::SETTLED->value,
             'code' => $data['code']
         ]);
+
+        RoundUpdated::dispatch($round->id);
 
         return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
