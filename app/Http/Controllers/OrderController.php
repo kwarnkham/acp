@@ -22,7 +22,7 @@ class OrderController extends Controller
         $filters = $request->validate([
             'round_id' => ['sometimes'],
             'user_id' => ['sometimes'],
-            'phone' => ['sometimes'],
+            'order_phone' => ['sometimes'],
             'status' => ['sometimes']
         ]);
 
@@ -33,7 +33,7 @@ class OrderController extends Controller
             ->filter($filters)
             ->with(['round.item', 'user']);
 
-        if ($request->exists('phone')) $query->whereRelation('user', 'name', 'like', '%' . $filters['phone'] . '%');
+        if ($request->exists('order_phone')) $query->whereRelation('user', 'name', 'like', '%' . $filters['order_phone'] . '%');
 
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
     }

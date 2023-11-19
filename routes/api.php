@@ -74,5 +74,7 @@ Route::controller(UserController::class)->middleware(['auth:sanctum'])->prefix('
     Route::middleware(['role:admin'])->group(function () {
         Route::post('telegram-notification/toggle', 'toggleTelegramNotification');
         Route::post('telegram-id/set', 'setTelegramId');
+        Route::get('', 'index');
+        Route::post('{user}/reset-password', 'resetPassword');
     });
 });

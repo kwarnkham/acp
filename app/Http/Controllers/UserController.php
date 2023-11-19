@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ResponseStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -17,6 +18,16 @@ class UserController extends Controller
         ]);
     }
 
+    public function index(Request $request)
+    {
+        $filters = $request->validate([
+            'phone' => ['sometimes']
+        ]);
+
+        $query = User::query()->filter($filters);
+        return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
+    }
+
     public function setTelegramId(Request $request)
     {
         $data = $request->validate([
@@ -27,5 +38,15 @@ class UserController extends Controller
         return response()->json([
             'user' => $user
         ]);
+    }
+
+    public function resetPassword(Request $request, User $user)
+    {
+        $password = Str::random(6);
+        $user->update([
+            'password' => $password
+        ]);
+
+        return response()->json(['password' => $password]);
     }
 }

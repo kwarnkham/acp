@@ -51,5 +51,11 @@ trait HasFilter
             fn ($query, $userId) =>
             $query->where('user_id', $userId)
         );
+
+        $query->when(
+            $filters['phone'] ?? null,
+            fn ($query, $phone) =>
+            $query->where('phone', 'like', "%$phone%")
+        );
     }
 }
