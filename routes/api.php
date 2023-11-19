@@ -6,6 +6,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PictureController;
 use App\Http\Controllers\RoundController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(AuthController::class)->group(function () {
@@ -67,4 +68,11 @@ Route::controller(PaymentMethodController::class)->middleware(['auth:sanctum'])-
     });
 
     Route::get('', 'index');
+});
+
+Route::controller(UserController::class)->middleware(['auth:sanctum'])->prefix('users')->group(function () {
+    Route::middleware(['role:admin'])->group(function () {
+        Route::post('telegram-notification/toggle', 'toggleTelegramNotification');
+        Route::post('telegram-id/set', 'setTelegramId');
+    });
 });

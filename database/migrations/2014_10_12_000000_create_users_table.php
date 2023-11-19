@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamps();
             $table->string('display_name')->nullable();
             $table->string('telegram_chat_id')->nullable();
+            $table->boolean('notification_active')->default(true);
         });
     }
 
