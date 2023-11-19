@@ -28,7 +28,7 @@ class NotifyAdmin implements ShouldQueue
      */
     public function handle(): void
     {
-        $admins = User::query()->whereRelation('roles', 'name', '=', 'admin')->pluck('telegram_chat_id')->filter(fn ($v) => $v != null);
+        $admins = User::query()->where('notification_active', true)->whereRelation('roles', 'name', '=', 'admin')->pluck('telegram_chat_id')->filter(fn ($v) => $v != null)->unique();
         if (count($admins) <= 0) return;
         $link = config('app.frontend_url') . '/order/' . $this->orderId;
         $message = "<a href='$link'>Order:$this->orderId</a> received a payment.";
