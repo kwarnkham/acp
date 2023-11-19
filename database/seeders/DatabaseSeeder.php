@@ -22,6 +22,5 @@ class DatabaseSeeder extends Seeder
             'user_id' => User::first(['id'])->id,
             'role_id' => Role::first(['id'])->id
         ]);
-        DB::table('preferences')->insert(['ticket_expiration' => 60]);
     }
 }

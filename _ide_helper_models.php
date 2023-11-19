@@ -96,6 +96,7 @@ namespace App\Models{
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $picture
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod query()
@@ -104,6 +105,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod wherePicture($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PaymentMethod whereUpdatedAt($value)
  */
@@ -129,25 +131,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Picture whereUpdatedAt($value)
  */
 	class Picture extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * App\Models\Preference
- *
- * @property int $id
- * @property int|null $ticket_expiration
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|Preference newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Preference newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Preference query()
- * @method static \Illuminate\Database\Eloquent\Builder|Preference whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Preference whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Preference whereTicketExpiration($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Preference whereUpdatedAt($value)
- */
-	class Preference extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -186,6 +169,7 @@ namespace App\Models{
  * @property int $expires_in
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $code
  * @property-read \App\Models\Item $item
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orderDetails
  * @property-read int|null $order_details_count
@@ -196,6 +180,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder|Round newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Round newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Round query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Round whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Round whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Round whereExpiresIn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Round whereId($value)
