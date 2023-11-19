@@ -21,8 +21,7 @@ class OrderObserver
      */
     public function updated(Order $order): void
     {
-        if ($order->status != OrderStatus::PAID->value)
-            OrderUpdated::dispatch($order->id);
+        OrderUpdated::dispatch($order->id);
     }
 
     /**
