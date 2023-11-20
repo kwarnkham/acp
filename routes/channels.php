@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -18,6 +19,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('rounds.*', function (User $user) {
-    return $user != null;
+Broadcast::channel('orders.{order}', function (User $user, Order $order) {
+    return $user->is_admin || $user->id == $order->user_id;
 });

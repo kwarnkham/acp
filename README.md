@@ -1,1 +1,2 @@
-clean up files in s3
+router auth in client
+slack loggin
