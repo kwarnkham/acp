@@ -45,11 +45,11 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
     });
 
     Route::post('guest', 'store');
+    Route::get('{order}', 'find');
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('', 'store');
         Route::get('', 'index');
-        Route::get('{order}', 'find');
         Route::post('{order}/pay', 'pay');
     });
 });
