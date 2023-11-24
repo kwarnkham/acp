@@ -22,7 +22,9 @@ class OrderController extends Controller
             'round_id' => ['sometimes'],
             'user_id' => ['sometimes'],
             'order_phone' => ['sometimes'],
-            'status' => ['sometimes']
+            'status' => ['sometimes'],
+            'from' => ['sometimes', 'date'],
+            'to' => ['sometimes', 'date'],
         ]);
 
         if (!$request->user()->is_admin) $filters['user_id'] = $request->user()->id;

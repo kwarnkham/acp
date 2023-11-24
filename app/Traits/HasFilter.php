@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 trait HasFilter
 {
@@ -56,6 +57,18 @@ trait HasFilter
             $filters['phone'] ?? null,
             fn ($query, $phone) =>
             $query->where('phone', 'like', "%$phone%")
+        );
+
+        $query->when(
+            $filters['from'] ?? null,
+            fn ($query, $from) =>
+            $query->where('updated_at', '>=', new Carbon($from))
+        );
+
+        $query->when(
+            $filters['to'] ?? null,
+            fn ($query, $to) =>
+            $query->where('updated_at', '<=', (new Carbon($to))->addDay()->subSecond())
         );
     }
 }
