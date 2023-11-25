@@ -34,4 +34,9 @@ class Round extends Model
     {
         return $this->belongsTo(Ticket::class);
     }
+
+    public function paymentMethods()
+    {
+        return $this->belongsToMany(PaymentMethod::class);
+    }
 }

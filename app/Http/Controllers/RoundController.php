@@ -82,7 +82,7 @@ class RoundController extends Controller
 
     public function find(Request $request, Round $round)
     {
-        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket', 'paymentMethods'])]);
     }
 
     public function index(Request $request)
@@ -93,5 +93,16 @@ class RoundController extends Controller
         ]);
         $query = Round::query()->latest('id')->with(['item', 'ticket'])->filter($filters);
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
+    }
+
+    public function togglePaymentMethod(Request $request, Round $round)
+    {
+        $data = $request->validate([
+            'payment_method_id' => ['required', 'exists:payment_methods,id']
+        ]);
+
+        $round->paymentMethods()->toggle($data['payment_method_id']);
+
+        return response()->json(['round' => $round->fresh(['item', 'orderDetails', 'ticket', 'paymentMethods'])]);
     }
 }

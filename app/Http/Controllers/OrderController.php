@@ -103,7 +103,13 @@ class OrderController extends Controller
 
     public function find(Request $request, Order $order)
     {
-        return response()->json(['order' => $order->load(['round.item', 'tickets', 'user'])]);
+        return response()->json(['order' => $order->load(
+            [
+                'round' => ['item', 'paymentMethods'],
+                'tickets',
+                'user'
+            ]
+        )]);
     }
 
     public function pay(Request $request, Order $order)

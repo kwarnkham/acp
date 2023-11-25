@@ -19,4 +19,9 @@ class PaymentMethod extends Model
             get: fn (?string $value) => $value ? Storage::url($value) : null,
         );
     }
+
+    public function rounds()
+    {
+        return $this->belongsToMany(Round::class);
+    }
 }
