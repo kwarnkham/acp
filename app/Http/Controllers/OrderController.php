@@ -36,7 +36,12 @@ class OrderController extends Controller
 
         if ($request->exists('order_phone')) $query->whereRelation('user', 'name', 'like', '%' . $filters['order_phone'] . '%');
 
-        return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);
+        $totalAmount = $query->get()->reduce(fn ($carry, $val) => $val->amount + $carry, 0);
+
+        return response()->json([
+            'data' => $query->paginate($request->per_page ?? 10),
+            'total_amount' => $totalAmount
+        ]);
     }
 
     public function store(Request $request)
