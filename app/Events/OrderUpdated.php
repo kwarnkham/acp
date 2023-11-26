@@ -22,11 +22,7 @@ class OrderUpdated implements ShouldBroadcast
      */
     public function __construct(int $orderId)
     {
-        $this->order = Order::with(['tickets', 'round' => [
-            'orderDetails',
-            'ticket',
-            'item'
-        ]])->find($orderId);
+        $this->order = Order::with(['tickets'])->find($orderId);
     }
 
     /**
