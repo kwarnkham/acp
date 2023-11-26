@@ -89,7 +89,8 @@ class RoundController extends Controller
     {
         $filters = $request->validate([
             'item_id' => ['sometimes'],
-            'status' => ['sometimes']
+            'status' => ['sometimes'],
+            'id' => ['sometimes']
         ]);
         $query = Round::query()->latest('id')->with(['item', 'ticket'])->filter($filters);
         return response()->json(['data' => $query->paginate($request->per_page ?? 10)]);

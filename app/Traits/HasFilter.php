@@ -15,6 +15,11 @@ trait HasFilter
         );
 
         $query->when(
+            $filters['id'] ?? null,
+            fn (Builder $query, $id) => $query->where('id', 'like', '%' . $id . '%')
+        );
+
+        $query->when(
             $filters['on_salse'] ?? null,
             fn ($query) => $query->whereNull('ticket_id')
         );
