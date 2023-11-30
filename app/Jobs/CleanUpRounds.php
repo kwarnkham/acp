@@ -28,12 +28,18 @@ class CleanUpRounds implements ShouldQueue
      */
     public function handle(): void
     {
-        $rounds = Round::query()->where([
+        $query = Round::query()->where([
             ['status', '=', RoundStatus::SETTLED->value],
             ['updated_at', '<', now()->subDays(7)],
-        ])->with(['orders'])->get();
+        ]);
+
+        $rounds = $query->with(['orders'])->get();
+
+        $query->updateQuietly(['ticket_id' => null]);
+
         $rounds->each(function ($round) {
             $round->orderDetails()->detach();
+            $round->paymentMethods()->detach();
             $round->orders()->delete();
             $round->delete();
         });
