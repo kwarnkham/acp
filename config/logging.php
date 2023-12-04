@@ -54,7 +54,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single', 'slack'],
+            'channels' => env('APP_ENV') == 'local' ? ['single'] : ['single', 'slack'],
             'ignore_exceptions' => false,
         ],
 

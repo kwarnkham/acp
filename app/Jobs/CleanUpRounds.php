@@ -35,7 +35,7 @@ class CleanUpRounds implements ShouldQueue
 
         $rounds = $query->with(['orders'])->get();
 
-        $query->updateQuietly(['ticket_id' => null]);
+        $query->update(['ticket_id' => null]);
 
         $rounds->each(function ($round) {
             $round->orderDetails()->detach();
