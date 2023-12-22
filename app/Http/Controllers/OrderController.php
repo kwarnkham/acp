@@ -86,6 +86,14 @@ class OrderController extends Controller
             ]);
 
             foreach ($data['codes'] as $code) {
+                abort_if(
+                    $round->orderDetails()
+                        ->whereNotIn('status', [OrderStatus::EXPIRED->value, OrderStatus::CANCELED->value])
+                        ->wherePivot('code', $code)
+                        ->exists(),
+                    ResponseStatus::BAD_REQUEST->value,
+                    "Number $code already sold out"
+                );
                 $order->tickets()->attach($round->id, [
                     'code' => $code,
                     'price' => $round->price_per_ticket
