@@ -55,6 +55,8 @@ class OrderController extends Controller
             'name' => ['required']
         ]);
 
+        abort_if($round->status != RoundStatus::ONGOING->value, ResponseStatus::BAD_REQUEST->value, "Round is finished");
+
         $codes = $round->orderDetails()
             ->whereNotIn('status', [OrderStatus::EXPIRED->value, OrderStatus::CANCELED->value])
             ->wherePivotIn('code', $data['codes'])

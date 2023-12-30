@@ -33,6 +33,7 @@ Route::controller(RoundController::class)->prefix('rounds')->group(function () {
         Route::post('', 'store');
         Route::put('{round}', 'update');
         Route::post('{round}/settle', 'settle');
+        Route::post('{round}/close', 'close');
         Route::post('{round}/payment-methods/toggle', 'togglePaymentMethod');
     });
     Route::get('', 'index');

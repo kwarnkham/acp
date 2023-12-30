@@ -80,6 +80,25 @@ class RoundController extends Controller
         return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
     }
 
+    public function close(Request $request, Round $round)
+    {
+        abort_if(
+            $round->orders()
+                ->whereIn('status', [OrderStatus::PENDING->value, OrderStatus::PAID->value])
+                ->exists(),
+            ResponseStatus::BAD_REQUEST->value,
+            'There are still unfinished orders'
+        );
+
+        $round->update([
+            'status' => RoundStatus::CLOSED->value,
+        ]);
+
+        RoundUpdated::dispatch($round->id);
+
+        return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket'])]);
+    }
+
     public function find(Request $request, Round $round)
     {
         return response()->json(['round' => $round->load(['item', 'orderDetails', 'ticket', 'paymentMethods'])]);
