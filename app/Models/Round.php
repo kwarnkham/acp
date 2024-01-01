@@ -21,7 +21,7 @@ class Round extends Model
         return $this->belongsToMany(Order::class)
             ->using(Ticket::class)
             ->withTimestamps()
-            ->withPivot(['code', 'price', 'id']);
+            ->withPivot(['code', 'price', 'id', 'protected']);
     }
 
     protected function progressPercentage(): Attribute

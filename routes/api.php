@@ -44,6 +44,7 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
     Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::post('{order}/cancel', 'cancel');
         Route::post('{order}/confirm', 'confirm');
+        Route::post('tickets/{ticket}/toggle-protect', 'toggleProtect');
     });
 
     Route::post('guest', 'store');

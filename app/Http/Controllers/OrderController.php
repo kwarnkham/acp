@@ -9,6 +9,7 @@ use App\Jobs\NotifyAdmin;
 use App\Jobs\ProcessExpiredOrder;
 use App\Models\Order;
 use App\Models\Round;
+use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -152,6 +153,13 @@ class OrderController extends Controller
         });
 
         return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);
+    }
+
+    public function toggleProtect(Request $request, Ticket $ticket)
+    {
+        $ticket->update(['protected' => !$ticket->protected]);
+
+        return response()->json(['ticket' => $ticket]);
     }
 
     public function cancel(Request $request, Order $order)

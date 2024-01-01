@@ -23,7 +23,7 @@ class Order extends Model
         return $this->belongsToMany(Round::class)
             ->using(Ticket::class)
             ->withTimestamps()
-            ->withPivot(['code', 'price', 'id']);
+            ->withPivot(['code', 'price', 'id', 'protected']);
     }
 
     public function user()

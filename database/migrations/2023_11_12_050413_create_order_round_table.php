@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('round_id')->constrained();
             $table->integer('code');
             $table->double('price');
+            $table->boolean('protected')->default(false);
             $table->timestamps();
         });
     }
