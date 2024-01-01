@@ -18,11 +18,7 @@ class ItemFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'max_tickets' => fake()->numberBetween(10, 9999),
-            'price_per_ticket' => fake()->numberBetween(10000, 99999),
-            'price' => fake()->numberBetween(10000, 1000000),
-            'note' => fake()->sentence(),
-            'expires_in' => fake()->numberBetween(30, 600)
+            'description' => fake()->sentence()
         ];
     }
 }
