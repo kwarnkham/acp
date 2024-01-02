@@ -17,7 +17,8 @@ class RoundController extends Controller
             'max_tickets' => ['required', 'max:1000', 'numeric'],
             'price_per_ticket' => ['required', 'min:0', 'numeric'],
             'price' => ['required', 'min:0', 'numeric'],
-            'expires_in' => ['sometimes', 'numeric'],
+            'expires_in' => ['required', 'numeric'],
+            'settles_on' => ['required', 'date'],
             'note' => ['sometimes'],
             'item_id' => ['required', 'exists:items,id']
         ]);

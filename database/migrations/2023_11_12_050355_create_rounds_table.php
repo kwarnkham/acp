@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedInteger('expires_in')->default(60);
             $table->timestamps();
             $table->integer('code')->nullable();
+            $table->date('settles_on')->nullable();
         });
     }
 
