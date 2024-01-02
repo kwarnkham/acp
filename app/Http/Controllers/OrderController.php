@@ -51,6 +51,7 @@ class OrderController extends Controller
         $data = $request->validate([
             'round_id' => ['required', 'exists:rounds,id'],
             'phone' => ['required'],
+            'address' => ['required'],
             'codes' => ['required', 'array'],
             'codes.*' => ['required', 'numeric', 'lte:' . $round->max_tickets],
             'name' => ['required']
@@ -70,6 +71,7 @@ class OrderController extends Controller
             if (!$user) $user = User::create([
                 'name' => $data['phone'],
                 'phone' => $data['phone'],
+                'address' => $data['address'],
                 'display_name' => $data['name'],
                 'password' => $data['phone']
             ]);
@@ -80,6 +82,10 @@ class OrderController extends Controller
                 }
                 if (!$request->user()->isAdmin)
                     if ($request->user()->phone != $user->phone) abort(ResponseStatus::BAD_REQUEST->value, "Phone number does not match");
+
+                $user->update([
+                    'address' => $data['address']
+                ]);
             }
 
             $order = $user->orders()->create([

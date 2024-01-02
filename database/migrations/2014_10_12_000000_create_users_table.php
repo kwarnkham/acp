@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('display_name')->nullable();
             $table->string('telegram_chat_id')->nullable();
             $table->boolean('notification_active')->default(true);
+            $table->string('address')->nullable();
         });
     }
 
