@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->string('screenshot')->nullable();
             $table->timestamps();
+            $table->double('discount')->default(0);
         });
     }
 

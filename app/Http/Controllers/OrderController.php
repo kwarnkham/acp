@@ -139,7 +139,8 @@ class OrderController extends Controller
 
         $data = $request->validate([
             'picture' => ['required', 'image'],
-            'note' => ['sometimes']
+            'note' => ['sometimes'],
+            'discount' => ['sometimes', 'numeric', 'required']
         ]);
 
         $user = $request->user();
@@ -152,7 +153,8 @@ class OrderController extends Controller
             $order->update([
                 'status' => $user->is_admin ? OrderStatus::CONFIRMED_PAID->value : OrderStatus::PAID->value,
                 'note' => $data['note'] ?? '',
-                'screenshot' => $path
+                'screenshot' => $path,
+                'discount' => $data['discount'] ?? 0
             ]);
 
             NotifyAdmin::dispatch($order->id);
@@ -186,6 +188,9 @@ class OrderController extends Controller
 
     public function confirm(Request $request, Order $order)
     {
+        $data = $request->validate([
+            'discount' => ['sometimes', 'numeric', 'required']
+        ]);
         abort_unless($request->user()->is_admin, ResponseStatus::UNAUTHORIZED->value);
 
         abort_unless(in_array($order->status, [
@@ -194,6 +199,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::CONFIRMED_PAID->value,
+            'discount' => $request->exists('discount') ? $data['discount'] : 0
         ]);
 
         return response()->json(['order' => $order->fresh(['round.item', 'tickets', 'user'])]);
