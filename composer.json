@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "barryvdh/laravel-ide-helper": "^2.13",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
@@ -20,6 +19,7 @@
         "spatie/laravel-backup": "^8.4"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.13",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
