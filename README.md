@@ -1,3 +1,3 @@
-router auth in client
-slack loggin
-log schedule actions
+### Client url
+
+[https://lucky.book-mm.com/round/117](https://lucky.book-mm.com/round/117)
